@@ -2,13 +2,13 @@
 
 ## Description
 
-Go package designed to assist developers and designers in evaluating the UX/UI of websites. Utilizing the powerful web scraping capabilities of Go's Colly package, `gouxchecker` focuses on essential elements such as font usage, image accessibility, correct spelling.
+Go package designed to assist developers and designers in evaluating the UX/UI of websites. Utilizing the powerful web scraping capabilities of Go's Colly package, `gouxchecker` focuses on essential elements such as font usage, image accessibility and correct spelling.
 
 ## Features
 
 Currently provides the following features:
 
-- Font Detection: Lists the fonts used on a webpage.
+- Font Detection: Lists the fonts used on a webpage. Ideally websites should have 3 or fewer separate fonts.
 - Image Alt Text Verification: Checks for the presence of alt text in images to improve accessibility.
 - Typo Detection: Scans the website content for any spelling errors.
 
@@ -22,7 +22,7 @@ To run gouxchecker, you need to set the target URL by modifying the url variable
 
 `url := "http://localhost:8080/"`
 
-You can also change `url` to point at a live website. After setting the url, run
+You can also change `url` to point at a live website. After setting the url, just
 `go run cmd/main.go`
 
 ## License
