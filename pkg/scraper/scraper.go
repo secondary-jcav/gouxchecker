@@ -19,7 +19,6 @@ func InitializeCollector(domain string) *colly.Collector {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	c := colly.NewCollector(
 		colly.AllowedDomains(u.Hostname()),
 	)
@@ -87,7 +86,7 @@ func StartScraping(c *colly.Collector, sc *spellcheck.Trie, url string) (map[str
 	misspelledWords := make(map[string]bool)
 	wg := &sync.WaitGroup{}
 	SetupHandlers(c, fontSet, altTexts, wg, misspelledWords, sc)
-	c.Visit(url)
+	c.Visit(url + "/")
 	c.Wait()  // Wait for all collectors to complete, including async visits
 	wg.Wait() // Wait for all goroutines to finish
 	return fontSet, altTexts, misspelledWords

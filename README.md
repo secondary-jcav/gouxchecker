@@ -20,10 +20,12 @@ Currently provides the following features:
 
 To run gouxchecker, you need to set the target URL by modifying the url variable in main.go. For example, if your development server is at port 8080 in localhost:
 
-`url := "http://localhost:8080/"`
+`url := "http://localhost:8080"`
 
 You can also change `url` to point at a live website. After setting the url, just
 `go run cmd/main.go`
+
+Results are currently stored in text files at the root of the project.
 
 ## License
 
