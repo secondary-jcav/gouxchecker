@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"log"
+	"net/http"
 	"net/url"
 	"strings"
 	"sync"
@@ -26,7 +27,7 @@ func InitializeCollector(domain string) *colly.Collector {
 	return c
 }
 
-func SetupHandlers(c *colly.Collector, fontSet map[string]bool, altTexts map[string][]string, wg *sync.WaitGroup, misspelledWords map[string]bool, sc *spellcheck.Trie) {
+func SetupHandlers(c *colly.Collector, fontSet map[string]bool, altTexts map[string][]string, wg *sync.WaitGroup, misspelledWords map[string]bool, sc *spellcheck.Trie, brokenLinks map[string]bool) {
 	c.OnHTML(`link[rel="stylesheet"]`, func(e *colly.HTMLElement) {
 		link := e.Request.AbsoluteURL(e.Attr("href"))
 		wg.Add(1) // Add to the WaitGroup just before initiating the goroutine
@@ -41,8 +42,17 @@ func SetupHandlers(c *colly.Collector, fontSet map[string]bool, altTexts map[str
 	})
 
 	c.OnResponse(func(r *colly.Response) {
+
 		if strings.Contains(r.Headers.Get("Content-Type"), "text/css") {
 			fonts.ExtractFonts(string(r.Body), fontSet)
+		}
+
+	})
+
+	c.OnError(func(r *colly.Response, err error) {
+
+		if r.StatusCode != http.StatusOK {
+			brokenLinks[r.Request.URL.String()] = true
 		}
 	})
 
@@ -74,20 +84,22 @@ func SetupHandlers(c *colly.Collector, fontSet map[string]bool, altTexts map[str
 
 		if parsedURL.Host == e.Request.URL.Host {
 			c.Visit(parsedURL.String())
+
 		}
 	})
 
 }
 
 // StartScraping begins the scraping process on the specified URL
-func StartScraping(c *colly.Collector, sc *spellcheck.Trie, url string) (map[string]bool, map[string][]string, map[string]bool) {
+func StartScraping(c *colly.Collector, sc *spellcheck.Trie, url string) (map[string]bool, map[string][]string, map[string]bool, map[string]bool) {
 	fontSet := make(map[string]bool)
 	altTexts := make(map[string][]string)
 	misspelledWords := make(map[string]bool)
+	brokenLinks := make(map[string]bool)
 	wg := &sync.WaitGroup{}
-	SetupHandlers(c, fontSet, altTexts, wg, misspelledWords, sc)
+	SetupHandlers(c, fontSet, altTexts, wg, misspelledWords, sc, brokenLinks)
 	c.Visit(url + "/")
 	c.Wait()  // Wait for all collectors to complete, including async visits
 	wg.Wait() // Wait for all goroutines to finish
-	return fontSet, altTexts, misspelledWords
+	return fontSet, altTexts, misspelledWords, brokenLinks
 }

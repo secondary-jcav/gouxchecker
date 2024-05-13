@@ -53,7 +53,7 @@ func TestStartSCraping(t *testing.T) {
 	time.Sleep(1 * time.Second)
 	c := colly.NewCollector()
 
-	fontSet, altText, misspelledWords := StartScraping(c, sc, "http://localhost:8080")
+	fontSet, altText, misspelledWords, _ := StartScraping(c, sc, "http://localhost:8080")
 
 	assert := assert.New(t)
 	assert.NotEmpty(fontSet)

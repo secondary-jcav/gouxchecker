@@ -10,7 +10,7 @@ func ImageAlts(noAlts []string, duplicateAlts []string) {
 
 	if len(noAlts) > 0 {
 		fmt.Println("Found images without alt text")
-		noAltsFile, err := os.Create("images_no_alt.txt")
+		noAltsFile, err := os.Create("results/images_no_alt.txt")
 		if err != nil {
 			fmt.Println("Error when creating the file:", err)
 			return
@@ -26,7 +26,7 @@ func ImageAlts(noAlts []string, duplicateAlts []string) {
 
 	if len(duplicateAlts) > 0 {
 		fmt.Println("Found images with duplicate alt text")
-		duplicateAltsFile, err := os.Create("images_duplicate_alt.txt")
+		duplicateAltsFile, err := os.Create("results/images_duplicate_alt.txt")
 		if err != nil {
 			fmt.Println("Error when creating the file:", err)
 			return
@@ -42,7 +42,7 @@ func ImageAlts(noAlts []string, duplicateAlts []string) {
 }
 
 func FontsResults(fontSet map[string]bool) {
-	fontsFile, err := os.Create("fonts.txt")
+	fontsFile, err := os.Create("results/fonts.txt")
 	if err != nil {
 		fmt.Println("Error when creating the file:", err)
 		return
@@ -67,7 +67,7 @@ func Typos(misspelledWords map[string]bool) {
 		}
 		fmt.Println("Possible typos found")
 		sort.Strings(keys)
-		file, err := os.Create("typos.txt")
+		file, err := os.Create("results/typos.txt")
 		if err != nil {
 			fmt.Println("Error when creating the file:", err)
 			return
@@ -78,4 +78,22 @@ func Typos(misspelledWords map[string]bool) {
 		}
 	}
 
+}
+
+func BrokenLinks(brokenLinks map[string]bool) {
+	if len(brokenLinks) > 0 {
+		fmt.Println("Found broken links")
+		file, err := os.Create("results/broken_links.txt")
+		if err != nil {
+			fmt.Println("Error when creating the file:", err)
+			return
+		}
+		defer file.Close()
+		for link := range brokenLinks {
+			fmt.Fprintln(file, link)
+		}
+
+	} else {
+		fmt.Println("No broken links found")
+	}
 }

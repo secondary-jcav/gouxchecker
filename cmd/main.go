@@ -20,13 +20,14 @@ func main() {
 	fmt.Println("Scraping target website")
 
 	// Start the scraping process and receive the collected data
-	fontSet, altTexts, misspelledWords := scraper.StartScraping(c, s, url)
+	fontSet, altTexts, misspelledWords, brokenLinks := scraper.StartScraping(c, s, url)
 
 	noAlts, duplicateAlts := images.CheckAltText(altTexts)
 
 	output.ImageAlts(noAlts, duplicateAlts)
 	output.FontsResults(fontSet)
 	output.Typos(misspelledWords)
+	output.BrokenLinks(brokenLinks)
 
 	elapsed := time.Since(start)
 	fmt.Println("Finished after ", elapsed)
