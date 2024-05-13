@@ -11,6 +11,7 @@ Currently provides the following features:
 - Font Detection: Lists the fonts used on a webpage. Ideally websites should have 3 or fewer separate fonts.
 - Image Alt Text Verification: Checks for the presence of alt text in images to improve accessibility.
 - Typo Detection: Scans the website content for any spelling errors.
+- Broken Links Detection: Lists every internal link that doesn't return an http status OK response.
 
 ## Prerequisites
 
