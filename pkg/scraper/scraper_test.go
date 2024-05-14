@@ -14,10 +14,10 @@ import (
 )
 
 func TestInitializeCollector(t *testing.T) {
-	domain := "example.com"
+	domain := "https://example.com"
 	collector := InitializeCollector(domain)
 	assert.NotNil(t, collector, "Collector should not be nil")
-	assert.Contains(t, collector.AllowedDomains, domain, "Domain should be in the list of allowed domains")
+	assert.Contains(t, collector.AllowedDomains, "example.com", "Domain should be in the list of allowed domains")
 }
 
 func TestStartSCraping(t *testing.T) {
