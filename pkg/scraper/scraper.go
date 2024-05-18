@@ -27,7 +27,7 @@ func InitializeCollector(domain string) *colly.Collector {
 	return c
 }
 
-func SetupHandlers(c *colly.Collector, fontSet map[string]bool, altTexts map[string][]string, wg *sync.WaitGroup, misspelledWords map[string]bool, sc *spellcheck.Trie, brokenLinks map[string]bool) {
+func SetupHandlers(c *colly.Collector, sc *spellcheck.Trie, wg *sync.WaitGroup, fontSet map[string]bool, altTexts map[string][]string, misspelledWords map[string]bool, brokenLinks map[string]bool) {
 	c.OnHTML(`link[rel="stylesheet"]`, func(e *colly.HTMLElement) {
 		link := e.Request.AbsoluteURL(e.Attr("href"))
 		wg.Add(1) // Add to the WaitGroup just before initiating the goroutine
@@ -97,7 +97,7 @@ func StartScraping(c *colly.Collector, sc *spellcheck.Trie, url string) (map[str
 	misspelledWords := make(map[string]bool)
 	brokenLinks := make(map[string]bool)
 	wg := &sync.WaitGroup{}
-	SetupHandlers(c, fontSet, altTexts, wg, misspelledWords, sc, brokenLinks)
+	SetupHandlers(c, sc, wg, fontSet, altTexts, misspelledWords, brokenLinks)
 	c.Visit(url + "/")
 	c.Wait()  // Wait for all collectors to complete, including async visits
 	wg.Wait() // Wait for all goroutines to finish
