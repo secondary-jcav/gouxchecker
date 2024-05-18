@@ -12,6 +12,7 @@ Currently provides the following features:
 - Image Alt Text Verification: Checks for the presence of alt text in images to improve accessibility.
 - Typo Detection: Scans the website content for any spelling errors.
 - Broken Links Detection: Lists every internal link that doesn't return an http status OK response.
+- Responsiveness: Possibles pages that don't comply with responsive web design.
 
 ## Prerequisites
 

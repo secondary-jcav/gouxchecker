@@ -97,3 +97,23 @@ func BrokenLinks(brokenLinks map[string]bool) {
 		fmt.Println("No broken links found")
 	}
 }
+
+func NonResponsivePages(containsMediaQueries bool, NonResponsivePages []string) {
+	if !containsMediaQueries && len(NonResponsivePages) > 0 {
+		fmt.Println("Pages might not follow responsive design")
+		file, err := os.Create("results/responsiveness.txt")
+		if err != nil {
+			fmt.Println("Error when creating the file:", err)
+			return
+		}
+		defer file.Close()
+		fmt.Fprintln(file, "Pages don't follow responsive web design")
+		for _, url := range NonResponsivePages {
+			fmt.Fprintln(file, url)
+		}
+
+	} else {
+		fmt.Println("Found responsive web design")
+	}
+
+}

@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/secondary-jcav/gouxchecker/pkg/fonts"
+	"github.com/secondary-jcav/gouxchecker/pkg/responsive"
 	"github.com/secondary-jcav/gouxchecker/pkg/spelling"
 
 	"github.com/gocolly/colly/v2"
@@ -27,7 +28,7 @@ func InitializeCollector(domain string) *colly.Collector {
 	return c
 }
 
-func SetupHandlers(c *colly.Collector, sc *spellcheck.Trie, wg *sync.WaitGroup, fontSet map[string]bool, altTexts map[string][]string, misspelledWords map[string]bool, brokenLinks map[string]bool) {
+func SetupHandlers(c *colly.Collector, sc *spellcheck.Trie, wg *sync.WaitGroup, fontSet map[string]bool, altTexts map[string][]string, misspelledWords map[string]bool, brokenLinks map[string]bool, visitedUrls map[string]bool, nonNativeUrls map[string]bool, containsMediaQueries *bool) {
 	c.OnHTML(`link[rel="stylesheet"]`, func(e *colly.HTMLElement) {
 		link := e.Request.AbsoluteURL(e.Attr("href"))
 		wg.Add(1) // Add to the WaitGroup just before initiating the goroutine
@@ -45,6 +46,9 @@ func SetupHandlers(c *colly.Collector, sc *spellcheck.Trie, wg *sync.WaitGroup, 
 
 		if strings.Contains(r.Headers.Get("Content-Type"), "text/css") {
 			fonts.ExtractFonts(string(r.Body), fontSet)
+			*containsMediaQueries = responsive.ContainsMediaQueries(string(r.Body))
+		} else {
+			visitedUrls[r.Request.URL.String()] = true
 		}
 
 	})
@@ -86,20 +90,29 @@ func SetupHandlers(c *colly.Collector, sc *spellcheck.Trie, wg *sync.WaitGroup, 
 			c.Visit(parsedURL.String())
 
 		}
+
+	})
+
+	c.OnHTML(`meta[name="viewport"]`, func(e *colly.HTMLElement) {
+		nonNativeUrls[e.Request.URL.String()] = false
+
 	})
 
 }
 
 // StartScraping begins the scraping process on the specified URL
-func StartScraping(c *colly.Collector, sc *spellcheck.Trie, url string) (map[string]bool, map[string][]string, map[string]bool, map[string]bool) {
+func StartScraping(c *colly.Collector, sc *spellcheck.Trie, url string) (map[string]bool, map[string][]string, map[string]bool, map[string]bool, map[string]bool, map[string]bool, bool) {
 	fontSet := make(map[string]bool)
 	altTexts := make(map[string][]string)
 	misspelledWords := make(map[string]bool)
 	brokenLinks := make(map[string]bool)
+	visitedUrls := make(map[string]bool) // I want to log every url that we visit
+	nonNativeUrls := make(map[string]bool)
+	containsMediaQueries := false
 	wg := &sync.WaitGroup{}
-	SetupHandlers(c, sc, wg, fontSet, altTexts, misspelledWords, brokenLinks)
+	SetupHandlers(c, sc, wg, fontSet, altTexts, misspelledWords, brokenLinks, visitedUrls, nonNativeUrls, &containsMediaQueries)
 	c.Visit(url + "/")
 	c.Wait()  // Wait for all collectors to complete, including async visits
 	wg.Wait() // Wait for all goroutines to finish
-	return fontSet, altTexts, misspelledWords, brokenLinks
+	return fontSet, altTexts, misspelledWords, brokenLinks, nonNativeUrls, visitedUrls, containsMediaQueries
 }
