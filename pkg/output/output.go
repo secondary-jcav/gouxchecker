@@ -47,6 +47,7 @@ func FontsResults(fontSet map[string]bool) {
 		fmt.Println("Error when creating the file:", err)
 		return
 	}
+	defer fontsFile.Close()
 	if len(fontSet) > 3 {
 
 		fmt.Println("Too many fonts")
