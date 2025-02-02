@@ -16,7 +16,7 @@ import (
 
 func main() {
 	// create a url without trailing slashes
-	urlPtr := flag.String("url", "https://mariaalejandraperez.com/", "Target URL to check")
+	urlPtr := flag.String("url", "http://localhost:8080", "Target URL to check")
 	flag.Parse()
 	if *urlPtr == "" {
 		log.Fatal("Please provide a URL using -url flag")
