@@ -34,7 +34,8 @@ Theres's also a dockerfile provided, and you can run the image setting the targe
 
 `docker build -t gouxchecker .`
 
-`docker run --rm gouxchecker -url=http://localhost:8080`
+`docker run --rm -v "$(pwd)/results:/root/results" gouxchecker -url=http://example.com
+`
 
 ## License
 
