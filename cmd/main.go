@@ -1,7 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
+	"strings"
 	"time"
 
 	"github.com/secondary-jcav/gouxchecker/pkg/images"
@@ -13,7 +16,12 @@ import (
 
 func main() {
 	// create a url without trailing slashes
-	url := "http://localhost:8080"
+	urlPtr := flag.String("url", "https://mariaalejandraperez.com/", "Target URL to check")
+	flag.Parse()
+	if *urlPtr == "" {
+		log.Fatal("Please provide a URL using -url flag")
+	}
+	url := strings.TrimRight(*urlPtr, "/")
 	start := time.Now()
 	c := scraper.InitializeCollector(url)
 	s := spelling.InitSpellchecker()
