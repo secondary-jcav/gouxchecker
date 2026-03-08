@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -22,24 +23,28 @@ func main() {
 		log.Fatal("Please provide a URL using -url flag")
 	}
 	url := strings.TrimRight(*urlPtr, "/")
+
+	if err := os.MkdirAll("results", 0755); err != nil {
+		log.Fatal("Could not create results directory: ", err)
+	}
+
 	start := time.Now()
 	c := scraper.InitializeCollector(url)
 	s := spelling.InitSpellchecker()
 
 	fmt.Println("Scraping target website")
 
-	// Start the scraping process and receive the collected data
-	fontSet, altTexts, misspelledWords, brokenLinks, nonNativeUrls, visitedUrls, containsMediaQueries := scraper.StartScraping(c, s, url)
+	result := scraper.StartScraping(c, s, url)
 
-	noAlts, duplicateAlts := images.CheckAltText(altTexts)
+	noAlts, duplicateAlts := images.CheckAltText(result.AltTexts)
 
-	nonResponsivePages := responsive.CheckResponsiveUrls(visitedUrls, nonNativeUrls)
+	nonResponsivePages := responsive.CheckResponsiveUrls(result.VisitedUrls, result.HasViewport)
 
 	output.ImageAlts(noAlts, duplicateAlts)
-	output.FontsResults(fontSet)
-	output.Typos(misspelledWords)
-	output.BrokenLinks(brokenLinks)
-	output.NonResponsivePages(containsMediaQueries, nonResponsivePages)
+	output.FontsResults(result.FontSet)
+	output.Typos(result.MisspelledWords)
+	output.BrokenLinks(result.BrokenLinks)
+	output.NonResponsivePages(result.ContainsMediaQueries, nonResponsivePages)
 
 	elapsed := time.Since(start)
 	fmt.Println("Finished after ", elapsed)

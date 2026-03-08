@@ -1,7 +1,7 @@
 package spelling
 
 import (
-	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
@@ -11,7 +11,7 @@ import (
 func InitSpellchecker() *spellcheck.Trie {
 	sc, err := spellcheck.New()
 	if err != nil {
-		fmt.Println("spellchecker error init")
+		log.Fatal("spellchecker init error: ", err)
 	}
 
 	return sc
