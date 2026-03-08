@@ -7,7 +7,6 @@ func CheckAltText(altTexts map[string][]string) ([]string, []string) {
 
 	noAlts := []string{}
 	duplicateAlts := []string{}
-	altOccurrences := make(map[string]bool)
 
 	for alt, srcs := range altTexts {
 		if len(srcs) > 1 && alt != "" {
@@ -19,10 +18,6 @@ func CheckAltText(altTexts map[string][]string) ([]string, []string) {
 			if alt == "" {
 				// If alt text is empty, add the source URL
 				noAlts = append(noAlts, src)
-			} else {
-				// If alt text is not empty, mark it as occurred
-				key := alt + ":" + src
-				altOccurrences[key] = true
 			}
 		}
 	}

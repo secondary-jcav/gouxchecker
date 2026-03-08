@@ -1,4 +1,4 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.24-alpine AS builder
 WORKDIR /app
 
 COPY go.mod go.sum ./
@@ -8,13 +8,14 @@ COPY . .
 
 RUN go build -o gouxchecker ./cmd/main.go
 
-FROM alpine:latest
+FROM alpine:3.21
 RUN apk --no-cache add ca-certificates
-WORKDIR /root/
+RUN adduser -D appuser
+WORKDIR /home/appuser/
 
 COPY --from=builder /app/gouxchecker .
 
-# EXPOSE 8080
+USER appuser
 
 ENTRYPOINT ["./gouxchecker"]
 CMD []

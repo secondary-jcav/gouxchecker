@@ -1,21 +1,22 @@
 package responsive
 
-import "strings"
+import (
+	"sort"
+	"strings"
+)
 
 func ContainsMediaQueries(cssContent string) bool {
 	return strings.Contains(cssContent, "media")
-
 }
 
-func CheckResponsiveUrls(visitedUrls, nonNativeUrls map[string]bool) []string {
-	// add to result if
-	//a) visitedUrl does not exist in nonNative or
-	//b) it exists and the value is true
+// CheckResponsiveUrls returns visited URLs that lack a <meta name="viewport"> tag.
+func CheckResponsiveUrls(visitedUrls, hasViewport map[string]bool) []string {
 	var results []string
 	for url := range visitedUrls {
-		if nonNative, exists := nonNativeUrls[url]; !exists || nonNative {
+		if !hasViewport[url] {
 			results = append(results, url)
 		}
 	}
+	sort.Strings(results)
 	return results
 }

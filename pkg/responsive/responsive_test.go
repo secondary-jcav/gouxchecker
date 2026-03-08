@@ -28,17 +28,17 @@ func TestCheckResponsiveUrls(t *testing.T) {
 		"http://sample.com":  true,
 	}
 
-	nonNativeUrls := map[string]bool{
-		"http://example.com": false,
-		"http://sample.com":  true,
+	// example.com has viewport → responsive, the others do not
+	hasViewport := map[string]bool{
+		"http://example.com": true,
 	}
 
-	results := CheckResponsiveUrls(visitedUrls, nonNativeUrls)
+	results := CheckResponsiveUrls(visitedUrls, hasViewport)
 	expectedResults := []string{"http://another.com", "http://sample.com"}
-	assert.Equal(results, expectedResults, "Should return correct URLs")
+	assert.Equal(expectedResults, results, "Should return non-responsive URLs, sorted")
 
 	emptyVisited := make(map[string]bool)
-	emptyNonNative := make(map[string]bool)
-	resultsEmpty := CheckResponsiveUrls(emptyVisited, emptyNonNative)
+	emptyHasViewport := make(map[string]bool)
+	resultsEmpty := CheckResponsiveUrls(emptyVisited, emptyHasViewport)
 	assert.Empty(resultsEmpty, "Should return an empty slice for empty input maps")
 }

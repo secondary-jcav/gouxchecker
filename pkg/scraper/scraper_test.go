@@ -20,7 +20,7 @@ func TestInitializeCollector(t *testing.T) {
 	assert.Contains(t, collector.AllowedDomains, "example.com", "Domain should be in the list of allowed domains")
 }
 
-func TestStartSCraping(t *testing.T) {
+func TestStartScraping(t *testing.T) {
 
 	sc := spelling.InitSpellchecker()
 
@@ -42,7 +42,7 @@ func TestStartSCraping(t *testing.T) {
 		<img src="example.jpg" alt="Descriptive text about the image">
 	</body>
 </html>`
-			fmt.Fprintf(w, htmlContent)
+			fmt.Fprint(w, htmlContent)
 		})
 		fmt.Println("Server starting on port 8080...")
 		if err := http.ListenAndServe(":8080", nil); err != nil {
@@ -53,11 +53,11 @@ func TestStartSCraping(t *testing.T) {
 	time.Sleep(1 * time.Second)
 	c := colly.NewCollector()
 
-	fontSet, altText, misspelledWords, _, _, _, _ := StartScraping(c, sc, "http://localhost:8080")
+	result := StartScraping(c, sc, "http://localhost:8080")
 
 	assert := assert.New(t)
-	assert.NotEmpty(fontSet)
-	assert.NotEmpty(altText)
-	assert.NotEmpty(misspelledWords)
+	assert.NotEmpty(result.FontSet)
+	assert.NotEmpty(result.AltTexts)
+	assert.NotEmpty(result.MisspelledWords)
 
 }
